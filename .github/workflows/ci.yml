@@ -7,24 +7,16 @@ on:
 jobs:
   build-x64:
     runs-on: macos-latest
-
+    
     steps:
       - uses: actions/checkout@v2
 
-      - name: Download dependencies
-        run: |
-          pwd
-          curl -LO https://nightly.link/iina-plus/homebrew-mpv-iina/actions/runs/2325943048/deps.zip
-          unzip -d deps deps
-          /usr/bin/sed -i '' 's/libswscale.6.dylib/libswscale.5.dylib/g' iina.xcodeproj/project.pbxproj
-          /usr/bin/sed -i '' 's/libavformat.59.dylib/libavformat.58.dylib/g' iina.xcodeproj/project.pbxproj
-          /usr/bin/sed -i '' 's/libavcodec.59.dylib/libavcodec.58.dylib/g' iina.xcodeproj/project.pbxproj
-          /usr/bin/sed -i '' 's/libavfilter.8.dylib/libavfilter.7.dylib/g' iina.xcodeproj/project.pbxproj
-          /usr/bin/sed -i '' 's/libavutil.57.dylib/libavutil.56.dylib/g' iina.xcodeproj/project.pbxproj
+      - name: Install dependencies
+        run: ./other/download_libs.sh
 
-      - name: Archive
-        run: make archive
-
+      - name: Build
+        run: xcodebuild -project iina.xcodeproj -scheme iina -config Release -archivePath ./archive
+        
       - name: Create tar
         run: |
           rm -rf ./IINA.app
